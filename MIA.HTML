@@ -1,0 +1,250 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profil Siswa 6A - Netflix Style</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%; background-color: black; color: white; font-family: Arial, sans-serif;
+    }
+    #introVideo {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1000;
+      background: black;
+    }
+    #mainContent {
+      display: none;
+      padding: 20px;
+      text-align: center;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .poster-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .poster {
+      width: 150px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.3s;
+    }
+    .poster:hover {
+      transform: scale(1.05);
+    }
+    .card {
+      background-color: #1e1e1e;
+      padding: 20px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 400px;
+      cursor: pointer;
+    }
+    .profile-pic {
+      width: 150px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    #backBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIDEO INTRO -->
+  <video autoplay muted playsinline id="introVideo">
+    <source src="netflix-intro.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- KONTEN UTAMA -->
+  <div id="mainContent">
+    <h1>NETFLIX</h1>
+    <h2>Pilih Profil</h2>
+    <div>
+      <button onclick="showCategory('students')">Students</button>
+      <button onclick="showCategory('teachers')">Teachers</button>
+      <button onclick="showCategory('memories')">Memories</button>
+      <button onclick="showCategory('school')">School</button>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="students" style="display:none;">
+      <h2>Pilih Film Favorit</h2>
+      <div class="poster-grid" id="posterGrid"></div>
+    </div>
+
+    <!-- DAFTAR SISWA PER FILM -->
+    <div id="studentList" style="display:none;">
+      <h2 id="filmTitle"></h2>
+      <div id="studentCards"></div>
+      <button id="backBtn" onclick="goBackToPosters()">Kembali ke Poster Film</button>
+    </div>
+
+    <!-- PROFIL SISWA -->
+    <div id="profileDetail" style="display:none; max-width: 400px; margin: auto;">
+      <h2>Profil Siswa</h2>
+      <img id="profilePic" class="profile-pic" src="" alt="Foto Siswa" />
+      <p id="profileInfo"></p>
+      <button id="backBtn" onclick="goBackToStudentList()">Kembali ke Daftar Siswa</button>
+    </div>
+  </div>
+
+<script>
+  // Ketika video intro selesai, sembunyikan video dan tampilkan konten utama
+  const introVideo = document.getElementById('introVideo');
+  const mainContent = document.getElementById('mainContent');
+
+  introVideo.addEventListener('ended', () => {
+    introVideo.style.display = 'none';  // sembunyikan video intro
+    mainContent.style.display = 'block'; // tampilkan konten utama
+  });
+
+  // Fungsi kategori dan lainnya sama seperti yang kamu punya
+  const films = [
+    { 
+      name: "WIRO SABLENG", 
+      image: "https://i.imgur.com/bYOZIXG.jpeg",
+      students: [
+        {
+          nama: "Azzouza Hukmikayna Kamil",
+          panggilan: "Auza",
+          ttl: "22/09/2012",
+          alamat: "Jl. Airmaya Rt 010/ Rw 008 No.8",
+          hobi: "Gitaran",
+          cita: "Punya Band yang terkenal dan sukses",
+          kenangan: "Smokebomb",
+          kontak: "082125058585",
+          sosmed: "kayy12_22",
+          pesan: "Makasih udah jadi teman//guru yang asik dan untuk temanku makasih udah jadi teman yang baik",
+          foto: "https://i.imgur.com/3MsH5XJ.jpeg"
+        },
+        {
+          nama: "Abdurrahman",
+          panggilan: "",
+          ttl: "",
+          alamat: "",
+          hobi: "",
+          cita: "",
+          kenangan: "",
+          kontak: "",
+          sosmed: "",
+          pesan: "",
+          foto: "https://i.imgur.com/4Nb1W7I.jpeg"
+        },
+        {
+          nama: "Adam Nur Diansyah",
+          panggilan: "Adam",
+          ttl: "27/09/2012",
+          alamat: "",
+          hobi: "Bermain Futsal",
+          cita: "Polisi",
+          kenangan: "Sholat Jumat Bareng",
+          kontak: "085715973641",
+          sosmed: "Instagram : @dammmm_ajaaa",
+          pesan: "Semoga sehat selalu",
+          foto: "https://i.imgur.com/Pk6nftt.jpeg"
+        }
+      ]
+    },
+    // ... film lainnya sama seperti sebelumnya ...
+  ];
+
+  function showCategory(cat) {
+    document.getElementById('students').style.display = (cat === 'students') ? 'block' : 'none';
+    document.getElementById('studentList').style.display = 'none';
+    document.getElementById('profileDetail').style.display = 'none';
+
+    if(cat === 'students') {
+      loadPosters();
+    }
+  }
+
+  function loadPosters() {
+    const container = document.getElementById('posterGrid');
+    container.innerHTML = '';
+    films.forEach((film, i) => {
+      const img = document.createElement('img');
+      img.src = film.image;
+      img.alt = film.name;
+      img.className = 'poster';
+      img.onclick = () => showStudentList(i);
+      container.appendChild(img);
+    });
+  }
+
+  function showStudentList(filmIndex) {
+    const film = films[filmIndex];
+    document.getElementById('filmTitle').textContent = film.name;
+    const container = document.getElementById('studentCards');
+    container.innerHTML = '';
+
+    if (film.students.length === 0) {
+      container.innerHTML = '<p>Tidak ada data siswa untuk film ini.</p>';
+    } else {
+      film.students.forEach((student, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<img src="${student.foto}" class="profile-pic" alt="${student.nama}" /><br/>${student.nama}`;
+        card.onclick = () => showProfile(filmIndex, idx);
+        container.appendChild(card);
+      });
+    }
+    document.getElementById('students').style.display = 'none';
+    document.getElementById('studentList').style.display = 'block';
+    document.getElementById('profileDetail').style.display = 'none';
+  }
+
+  function showProfile(filmIndex, studentIndex) {
+    const student = films[filmIndex].students[studentIndex];
+    document.getElementById('profilePic').src = student.foto;
+    
+    let infoHtml = `
+      <strong>Nama:</strong> ${student.nama}<br/>
+      <strong>Panggilan:</strong> ${student.panggilan || '-'}<br/>
+      <strong>Tanggal Lahir:</strong> ${student.ttl || '-'}<br/>
+      <strong>Alamat:</strong> ${student.alamat || '-'}<br/>
+      <strong>Hobi:</strong> ${student.hobi || '-'}<br/>
+      <strong>Cita-cita:</strong> ${student.cita || '-'}<br/>
+      <strong>Kenangan:</strong> ${student.kenangan || '-'}<br/>
+      <strong>Kontak:</strong> ${student.kontak || '-'}<br/>
+      <strong>Sosmed:</strong> ${student.sosmed || '-'}<br/>
+      <strong>Pesan:</strong> ${student.pesan || '-'}
+    `;
+    document.getElementById('profileInfo').innerHTML = infoHtml;
+
+    document.getElementById('students').style.display = 'none';
+    document.getElementById('studentList').style.display = 'none';
+    document.getElementById('profileDetail').style.display = 'block';
+  }
+
+  function goBackToPosters() {
+    document.getElementById('students').style.display = 'block';
+    document.getElementById('studentList').style.display = 'none';
+    document.getElementById('profileDetail').style.display = 'none';
+  }
+
+  function goBackToStudentList() {
+    document.getElementById('students').style.display = 'none';
+    document.getElementById('studentList').style.display = 'block';
+    document.getElementById('profileDetail').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
